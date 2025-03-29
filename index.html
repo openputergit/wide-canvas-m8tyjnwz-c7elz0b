@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KittyLearn - Adaptive Learning Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        body {
+            font-family: 'Comic Neue', cursive;
+            background-color: #FFF0F5;
+        }
+        .kitty-shadow {
+            box-shadow: 0 4px 12px rgba(255, 182, 193, 0.5);
+        }
+        .progress-bar {
+            transition: width 0.5s ease-in-out;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        .bounce-animation {
+            animation: bounce 2s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="min-h-screen">
+        <!-- Navigation -->
+        <nav class="bg-pink-200 p-4">
+            <div class="container mx-auto flex justify-between items-center">
+                <div class="flex items-center">
+                    <img src="https://api.dicebear.com/7.x/bottts/svg?seed=kitty" alt="KittyLearn Logo" class="w-12 h-12">
+                    <span class="text-2xl font-bold text-pink-600 ml-2">KittyLearn</span>
+                </div>
+                <div class="hidden md:flex space-x-6">
+                    <a href="#dashboard" class="text-pink-600 hover:text-pink-800">Dashboard</a>
+                    <a href="#lessons" class="text-pink-600 hover:text-pink-800">Lessons</a>
+                    <a href="#progress" class="text-pink-600 hover:text-pink-800">Progress</a>
+                </div>
+                <button class="md:hidden text-pink-600" onclick="toggleMenu()">
+                    <i class="bi bi-list text-2xl"></i>
+                </button>
+            </div>
+        </nav>
+
+        <!-- Mobile Menu -->
+        <div id="mobileMenu" class="hidden bg-pink-100 p-4 md:hidden">
+            <a href="#dashboard" class="block text-pink-600 py-2">Dashboard</a>
+            <a href="#lessons" class="block text-pink-600 py-2">Lessons</a>
+            <a href="#progress" class="block text-pink-600 py-2">Progress</a>
+        </div>
+
+        <!-- Main Content -->
+        <div class="container mx-auto px-4 py-8">
+            <!-- Welcome Section -->
+            <div class="text-center mb-12">
+                <h1 class="text-4xl font-bold text-pink-600 mb-4">Welcome to KittyLearn!</h1>
+                <p class="text-gray-600">Your personalized learning journey starts here!</p>
+            </div>
+
+            <!-- Learning Progress -->
+            <div class="bg-white rounded-lg p-6 kitty-shadow mb-8">
+                <h2 class="text-2xl font-bold text-pink-600 mb-4">Your Learning Progress</h2>
+                <div class="bg-gray-200 rounded-full h-4 mb-4">
+                    <div id="progressBar" class="bg-pink-400 rounded-full h-4 progress-bar" style="width: 0%"></div>
+                </div>
+                <p class="text-gray-600">Current Level: <span id="currentLevel">1</span></p>
+            </div>
+
+            <!-- Recommended Lessons -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                <div class="bg-white rounded-lg p-6 kitty-shadow hover:transform hover:scale-105 transition-transform">
+                    <i class="bi bi-book text-4xl text-pink-500"></i>
+                    <h3 class="text-xl font-bold text-pink-600 mt-4">Math Adventure</h3>
+                    <p class="text-gray-600 mt-2">AI-recommended based on your learning style</p>
+                    <button onclick="startLesson('math')" class="mt-4 bg-pink-500 text-white px-4 py-2 rounded-full hover:bg-pink-600">Start Learning</button>
+                </div>
+                <div class="bg-white rounded-lg p-6 kitty-shadow hover:transform hover:scale-105 transition-transform">
+                    <i class="bi bi-translate text-4xl text-pink-500"></i>
+                    <h3 class="text-xl font-bold text-pink-600 mt-4">Language Quest</h3>
+                    <p class="text-gray-600 mt-2">Interactive language learning experience</p>
+                    <button onclick="startLesson('language')" class="mt-4 bg-pink-500 text-white px-4 py-2 rounded-full hover:bg-pink-600">Start Learning</button>
+                </div>
+                <div class="bg-white rounded-lg p-6 kitty-shadow hover:transform hover:scale-105 transition-transform">
+                    <i class="bi bi-atom text-4xl text-pink-500"></i>
+                    <h3 class="text-xl font-bold text-pink-600 mt-4">Science Explorer</h3>
+                    <p class="text-gray-600 mt-2">Discover the wonders of science</p>
+                    <button onclick="startLesson('science')" class="mt-4 bg-pink-500 text-white px-4 py-2 rounded-full hover:bg-pink-600">Start Learning</button>
+                </div>
+            </div>
+
+            <!-- Achievement Badges -->
+            <div class="bg-white rounded-lg p-6 kitty-shadow">
+                <h2 class="text-2xl font-bold text-pink-600 mb-4">Your Achievements</h2>
+                <div class="flex flex-wrap gap-4" id="badges">
+                    <!-- Badges will be added here dynamically -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mobile menu toggle
+        function toggleMenu() {
+            const menu = document.getElementById('mobileMenu');
+            menu.classList.toggle('hidden');
+        }
+
+        // Progress tracking
+        let progress = 0;
+        let level = 1;
+        const progressBar = document.getElementById('progressBar');
+        const currentLevel = document.getElementById('currentLevel');
+
+        function updateProgress() {
+            progress += 10;
+            if (progress > 100) {
+                progress = 0;
+                level++;
+                currentLevel.textContent = level;
+                addBadge();
+            }
+            progressBar.style.width = `${progress}%`;
+        }
+
+        // Lesson start function
+        function startLesson(subject) {
+            alert(`Starting ${subject} lesson! Your personal AI tutor is ready.`);
+            updateProgress();
+        }
+
+        // Badge system
+        const badges = document.getElementById('badges');
+        const badgeTypes = ['🌟', '🎓', '🏆', '📚', '🎯'];
+        let badgeCount = 0;
+
+        function addBadge() {
+            if (badgeCount < badgeTypes.length) {
+                const badge = document.createElement('div');
+                badge.className = 'bg-pink-100 rounded-full p-4 text-2xl bounce-animation';
+                badge.textContent = badgeTypes[badgeCount];
+                badges.appendChild(badge);
+                badgeCount++;
+            }
+        }
+
+        // Initialize first badge
+        addBadge();
+    </script>
+<script>document.body.addEventListener('wheel', e => { if (!e.ctrlKey) return; e.preventDefault(); return }, { passive: false })</script>
+	</body>
+</html>
